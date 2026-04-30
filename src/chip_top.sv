@@ -31,11 +31,14 @@ module chip_top #(
 
     wire clk_PAD2CORE;
     wire rst_n_PAD2CORE;
-    
+
+    `ifdef NUM_INPUT_PADS
     wire [NUM_INPUT_PADS-1:0] input_PAD2CORE;
     wire [NUM_INPUT_PADS-1:0] input_CORE2PAD_PU;
     wire [NUM_INPUT_PADS-1:0] input_CORE2PAD_PD;
+    `endif
 
+    `ifdef NUM_BIDIR_PADS
     wire [NUM_BIDIR_PADS-1:0] bidir_PAD2CORE;
     wire [NUM_BIDIR_PADS-1:0] bidir_CORE2PAD;
     wire [NUM_BIDIR_PADS-1:0] bidir_CORE2PAD_OE;
@@ -44,6 +47,7 @@ module chip_top #(
     wire [NUM_BIDIR_PADS-1:0] bidir_CORE2PAD_IE;
     wire [NUM_BIDIR_PADS-1:0] bidir_CORE2PAD_PU;
     wire [NUM_BIDIR_PADS-1:0] bidir_CORE2PAD_PD;
+    `endif
 
     // Power/ground pad instances
     generate
@@ -104,6 +108,7 @@ module chip_top #(
         .PD     (1'b0)
     );
 
+    `ifdef NUM_INPUT_PADS
     generate
     for (genvar i=0; i<NUM_INPUT_PADS; i++) begin : inputs
         (* keep *)
@@ -123,7 +128,9 @@ module chip_top #(
         );
     end
     endgenerate
+    `endif
 
+    `ifdef NUM_BIDIR_PADS
     generate
     for (genvar i=0; i<NUM_BIDIR_PADS; i++) begin : bidir
         (* keep *)
@@ -149,7 +156,9 @@ module chip_top #(
         );
     end
     endgenerate
+    `endif
 
+    `ifdef NUM_ANALOG_PADS
     generate
     for (genvar i=0; i<NUM_ANALOG_PADS; i++) begin : analog
         (* keep *)
@@ -164,6 +173,7 @@ module chip_top #(
         );
     end
     endgenerate
+    `endif
 
     // Core design
 
@@ -179,11 +189,14 @@ module chip_top #(
     
         .clk        (clk_PAD2CORE),
         .rst_n      (rst_n_PAD2CORE),
-    
+
+        `ifdef NUM_INPUT_PADS
         .input_in   (input_PAD2CORE),
         .input_pu   (input_CORE2PAD_PU),
         .input_pd   (input_CORE2PAD_PD),
+        `endif
 
+        `ifdef NUM_BIDIR_PADS
         .bidir_in   (bidir_PAD2CORE),
         .bidir_out  (bidir_CORE2PAD),
         .bidir_oe   (bidir_CORE2PAD_OE),
@@ -192,8 +205,11 @@ module chip_top #(
         .bidir_ie   (bidir_CORE2PAD_IE),
         .bidir_pu   (bidir_CORE2PAD_PU),
         .bidir_pd   (bidir_CORE2PAD_PD),
-        
+        `endif
+
+        `ifdef NUM_ANALOG_PADS
         .analog     (analog_PAD)
+        `endif
     );
     
     // Chip ID - do not remove, necessary for tapeout
